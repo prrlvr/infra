@@ -1,0 +1,7 @@
+---
+kind: Kustomization
+namespace: metallb-system
+
+resources:
+  - advertisement.yml
+  - ip-pool.yml
