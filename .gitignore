@@ -1,0 +1,4 @@
+terraform/mikrotik/.terraform
+*.tfstate
+terraform.tfstate.*
+.env
