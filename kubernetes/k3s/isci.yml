@@ -1,0 +1,77 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k3s-isci-provider
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    name: in-cluster
+    namespace: storage
+  project: default
+  sources:
+    - repoURL: https://democratic-csi.github.io/charts/
+      chart: democratic-csi
+      targetRevision: 0.14.7
+      helm:
+        values: |
+            csiDriver:
+              name: "iscsi"
+            storageClasses:
+            - name: iscsi
+              defaultClass: true
+              reclaimPolicy: Retain
+              volumeBindingMode: Immediate
+              allowVolumeExpansion: true
+              parameters:
+                fsType: ext4
+                detachedVolumesFromSnapshots: "false"
+              mountOptions: []
+              secrets:
+                provisioner-secret:
+                controller-publish-secret:
+                node-stage-secret:
+                node-publish-secret:
+                controller-expand-secret:
+            volumeSnapshotClasses: []
+            driver:
+              config:
+                driver: freenas-api-iscsi
+                instance_id:
+                httpConnection:
+                  protocol: http
+                  host: 10.0.40.9
+                  port: 80
+                  apiKey: 1-EJntADFYt0hB3H47h3Y0KSyFLLR5aoeuc25yVqhcWipCAjepMErz8YyS1ZZ1oBep 
+                  allowInsecure: true
+                zfs:
+                  datasetParentName: pool-0/k3s/k3s
+                  detachedSnapshotsDatasetParentName: pool-0/k3s/k3s
+                  zvolCompression:
+                  zvolDedup:
+                  zvolEnableReservation: false
+                  zvolBlocksize:
+                iscsi:
+                  targetPortal: "10.0.40.9:3260"
+                  targetPortals: [] 
+                  interface:
+                  namePrefix: csi-
+                  nameSuffix:
+                  targetGroups:
+                    - targetGroupPortalGroup: 1
+                      targetGroupInitiatorGroup: 1
+                      targetGroupAuthType: None
+                      targetGroupAuthGroup:
+                  extentInsecureTpc: true
+                  extentXenCompat: false
+                  extentDisablePhysicalBlocksize: true
+                  extentBlocksize: 512
+                  extentRpm: "SSD"
+                  extentAvailThreshold: 0
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
