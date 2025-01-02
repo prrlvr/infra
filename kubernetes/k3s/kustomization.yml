@@ -5,6 +5,7 @@ namespace: argocd
 resources:
   # - isci.yml
   - cert-manager.yml
+  - echo.yml
   - metallb.yml
   - nfs.yml
   - vault.yml
