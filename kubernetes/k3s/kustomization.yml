@@ -6,6 +6,6 @@ resources:
   # - isci.yml
   - cert-manager.yml
   - echo.yml
-  - metallb.yml
+  # - metallb.yml
   - nfs.yml
   - vault.yml
