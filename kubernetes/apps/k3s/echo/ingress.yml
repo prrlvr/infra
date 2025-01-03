@@ -7,12 +7,7 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt
     cert-manager.io/revision-history-limit: "1"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_set_header X-Geo-Location-Region $geoip2_city_country_code;
-      proxy_set_header X-Geo-Location-City $geoip2_city;
-      proxy_set_header X-Geo-Location-Coordinates "$geoip2_latitude,$geoip2_longitude";
 spec:
-  ingressClassName: nginx
   rules:
     - host: k3s.prrlvr.fr
       http:
