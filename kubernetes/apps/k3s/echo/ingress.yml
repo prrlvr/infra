@@ -19,7 +19,18 @@ spec:
                 name: echo
                 port:
                   name: http
+    - host: echo.k3s.prrlvr.fr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: echo
+                port:
+                  name: http
   tls:
     - hosts:
         - k3s.prrlvr.fr
+        - echo.k3s.prrlvr.fr
       secretName: echo-tls
