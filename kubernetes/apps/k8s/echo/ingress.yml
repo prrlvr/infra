@@ -1,0 +1,36 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: echo
+  namespace: echo
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    cert-manager.io/revision-history-limit: "1"
+spec:
+  rules:
+    - host: k8s.prrlvr.fr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: echo
+                port:
+                  name: http
+    - host: echo.k8s.prrlvr.fr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: echo
+                port:
+                  name: http
+  tls:
+    - hosts:
+        - k8s.prrlvr.fr
+        - echo.k8s.prrlvr.fr
+      secretName: echo-tls

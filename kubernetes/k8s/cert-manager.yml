@@ -1,0 +1,58 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    name: in-cluster
+    namespace: cert-manager
+  project: default
+  sources:
+    - repoURL: https://charts.jetstack.io
+      chart: cert-manager
+      targetRevision: v1.16.2
+      helm:
+        releaseName: cert-manager
+        values: |
+          installCRDs: true
+          podDnsPolicy: "None"
+          podDnsConfig:
+            nameservers:
+              - "10.0.40.1"
+              - "1.1.1.1"
+    - repoURL: https://aureq.github.io/cert-manager-webhook-ovh/
+      chart: cert-manager-webhook-ovh
+      targetRevision: v0.7.3
+      helm:
+        values: |
+          configVersion: 0.0.1
+          groupName: acme.prrlvr.fr
+          certManager:
+            namespace: cert-manager
+          issuers:
+            - name: letsencrypt
+              create: true
+              kind: ClusterIssuer
+              cnameStrategy: None
+              acmeServerUrl: https://acme-v02.api.letsencrypt.org/directory
+              email: admin@prrlvr.fr
+              ovhEndpointName: ovh-eu
+              ovhAuthenticationRef:
+                applicationKeyRef:
+                  name: ovh-credentials
+                  key: application_key
+                applicationSecretRef:
+                  name: ovh-credentials
+                  key: application_secret
+                consumerKeyRef:
+                  name: ovh-credentials
+                  key: consumer_key
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true

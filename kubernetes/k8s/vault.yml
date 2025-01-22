@@ -1,0 +1,86 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vault
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    name: in-cluster
+    namespace: vault
+  project: default
+  sources:
+    - repoURL: https://helm.releases.hashicorp.com
+      chart: vault
+      targetRevision: 0.29.1
+      helm:
+        values: |
+          fullnameOverride: vault
+          global:
+            enabled: true
+            tlsDisable: false
+          injector:
+            enabled: false
+          server:
+            image:
+              repository: hashicorp/vault
+              tag: 1.18.3
+            standalone:
+              enabled: true
+              config: |
+                ui = true
+                listener "tcp" {
+                  address = "[::]:8200"
+                  cluster_address = "[::]:8201"
+                  tls_cert_file = "/vault/userconfig/tls/tls.crt"
+                  tls_key_file = "/vault/userconfig/tls/tls.key"
+                  tls_require_and_verify_client_cert = false
+                  telemetry {
+                    unauthenticated_metrics_access = true
+                  }
+                }
+                storage "file" {
+                  path = "/vault/data"
+                }
+                telemetry {
+                  prometheus_retention_time = "30s"
+                  disable_hostname = true
+                }
+            updateStrategyType: RollingUpdate
+            volumes:
+              - name: tls
+                secret:
+                  secretName: vault-k8s-tls
+            volumeMounts:
+              - mountPath: /vault/userconfig/tls
+                name: tls
+                readOnly: true
+            dataStorage:
+              enabled: true
+              size: 5Gi
+              storageClass: freenas-nfs-csi
+            auditStorage:
+              enabled: true
+              size: 5Gi
+              storageClass: freenas-nfs-csi
+            readinessProbe:
+              enabled: true
+              path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204"
+            service:
+              type: NodePort
+              nodePort: 30820
+            ingress:
+              enabled: false
+          serverTelemetry:
+            serviceMonitor:
+              enabled: false
+    - repoURL: https://github.com/prrlvr/infra.git
+      targetRevision: HEAD
+      path: kubernetes/apps/k8s/vault
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
