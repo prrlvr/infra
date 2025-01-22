@@ -20,7 +20,7 @@ spec:
         values: |
           controller:
             service:
-              type: ClusterIP
+              type: ""
               ipFamilyPolicy: SingleStack
             replicaCount: 2
             minAvailable: 1
@@ -33,6 +33,8 @@ spec:
               proxy-buffer-size: "16k"
               annotations-risk-level: "Critical"
               strict-validate-path-type: "false"
+            extraArgs:
+              publish-status-address: 93.31.83.49
           defaultBackend:
             enabled: true
             replicaCount: 1
