@@ -1,0 +1,6 @@
+---
+kind: Kustomization
+namespace: external-secrets
+
+resources:
+  - vault.yml
