@@ -19,9 +19,9 @@ spec:
         releaseName: ingress-nginx
         values: |
           controller:
+            hostNetwork: true
             service:
               type: ""
-              ipFamilyPolicy: SingleStack
             replicaCount: 2
             minAvailable: 1
             allowSnippetAnnotations: true
@@ -35,6 +35,7 @@ spec:
               strict-validate-path-type: "false"
             extraArgs:
               publish-status-address: 93.31.83.49
+              enable-ssl-passthrough: true
           defaultBackend:
             enabled: true
             replicaCount: 1
