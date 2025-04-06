@@ -1,0 +1,63 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cnpg-postgres-16
+spec:
+  instances: 3
+  imageName: ghcr.io/cloudnative-pg/postgresql:16.8-8
+  primaryUpdateStrategy: unsupervised
+  primaryUpdateMethod: switchover
+  storage:
+    size: 20Gi
+    storageClass: freenas-nfs-csi
+  superuserSecret:
+    name: postgres-superuser
+  enableSuperuserAccess: true
+  postgresql:
+    pg_hba:
+      - hostssl all all all scram-sha-256
+      - hostnossl all all all reject
+    parameters:
+      max_connections: "500"
+      shared_buffers: 128MB
+  resources:
+    requests:
+      cpu: '1'
+      memory: 2Gi
+    limits:
+      cpu: 1500m
+      memory: 3Gi
+  monitoring:
+    enablePodMonitor: true
+    podMonitorMetricRelabelings:
+      - sourceLabels:
+          - cluster
+        targetLabel: cnpg_cluster
+      - regex: cluster
+        action: labeldrop
+  managed:
+    services:
+      disabledDefaultServices:
+        - ro
+        - r
+      additional:
+        - selectorType: rw
+          serviceTemplate:
+            metadata:
+              name: cnpg-postgres-main
+            spec:
+              type: ClusterIP
+        - selectorType: ro
+          serviceTemplate:
+            metadata:
+              name: cnpg-postgres-main-ro
+            spec:
+              type: ClusterIP
+    roles:
+      - connectionLimit: -1
+        ensure: present
+        inherit: true
+        login: true
+        name: forgejo
+        passwordSecret:
+          name: postgres-users-forgejo

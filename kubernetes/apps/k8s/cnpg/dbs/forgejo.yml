@@ -1,0 +1,11 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: cnpg-postgres-16-forgejo
+spec:
+  name: forgejo
+  owner: forgejo
+  cluster:
+    name: cnpg-postgres-16
+  databaseReclaimPolicy: retain
