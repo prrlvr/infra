@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: cnpg-system
 
 resources:
-  - dbs
+  # - dbs
   - postgres-cluster.yml
   - secrets.yml
   - secret-users.yml
