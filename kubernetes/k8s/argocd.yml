@@ -78,7 +78,6 @@ spec:
               ingressClassName: nginx
               hostname: argo.k8s.prrlvr.fr
               tls: true
-              https: true
             repoServer:
               autoscaling:
                 enabled: true
