@@ -4,8 +4,10 @@ namespace: argocd
 
 resources:
   - cert-manager.yml
+  - cnpg.yml
   - echo.yml
   - external-secrets.yml
   - ingress-nginx.yml
   - nfs.yml
+  - pgadmin.yml
   - vault.yml

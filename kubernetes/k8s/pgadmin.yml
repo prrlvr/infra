@@ -1,0 +1,56 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pgadmin
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    name: in-cluster
+    namespace: pgadmin
+  project: default
+  sources:
+    - repoURL: https://helm.runix.net
+      chart: pgadmin4
+      targetRevision: 1.37.0
+      helm:
+        values: |
+          image:
+            repository: dpage/pgadmin4
+            tag: 9.2
+          existingSecret: pgadmin-creds
+          secretKeys:
+            pgadminPasswordKey: password
+          env:
+            email: admin@prrlvr.fr
+          ingress:
+            enabled: true
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt
+            ingressClassName: nginx
+            hosts:
+              - host: pgadmin.k8s.prrlvr.fr
+                paths:
+                  - path: /
+                    pathType: Prefix
+            tls:
+              - secretName: pgadmin-tls
+                hosts:
+                  - pgadmin.k8s.prrlvr.fr
+          persistentVolume:
+            enabled: true
+            accessModes:
+              - ReadWriteOnce
+            size: 5Gi
+            storageClass: freenas-nfs-csi
+    - repoURL: https://github.com/prrlvr/infra.git
+      targetRevision: HEAD
+      path: kubernetes/apps/k8s/pgadmin
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
+
