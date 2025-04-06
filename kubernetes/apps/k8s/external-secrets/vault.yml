@@ -10,12 +10,9 @@ spec:
       path: k8s-prrlvr-fr
       version: v2
       auth:
-        tokenSecretRef:
-          name: vault-token-tmp
-          key: token
-        # kubernetes:
-        #   mountPath: "k8s-prrlvr-fr"
-        #   role: k8s-prrlvr-fr-external-secrets
-          # serviceAccountRef:
-          #   name: external-secrets-vault
-          #   namespace: external-secrets
+        kubernetes:
+          mountPath: "k8s-prrlvr-fr"
+          role: k8s-prrlvr-fr-external-secrets
+          serviceAccountRef:
+            name: external-secrets-vault
+            namespace: external-secrets
