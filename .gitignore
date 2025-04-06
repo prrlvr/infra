@@ -1,4 +1,6 @@
-terraform/mikrotik/.terraform
+.terraform
+.terraform.lock.hcl
 *.tfstate
+*.swp
 terraform.tfstate.*
 .env
