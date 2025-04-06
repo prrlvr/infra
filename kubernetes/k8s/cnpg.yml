@@ -15,8 +15,8 @@ spec:
       targetRevision: HEAD
       path: kubernetes/apps/k8s/cnpg
     - repoURL: https://cloudnative-pg.io/charts/
-      chart: cnpg
-      targetRevision: 4.12.0
+      chart: cloudnative-pg
+      targetRevision: 0.23.2
       helm:
         values: |
           config:
