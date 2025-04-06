@@ -11,7 +11,7 @@ spec:
       version: v2
       auth:
         kubernetes:
-          mountPath: "kubernetes"
+          mountPath: "k8s-prrlvr-fr"
           role: k8s-prrlvr-fr-external-secrets
           serviceAccountRef:
             name: external-secrets-vault
