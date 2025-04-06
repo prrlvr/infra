@@ -1,0 +1,107 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    name: in-cluster
+    namespace: argocd
+  project: default
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
+  sources:
+    - repoURL: https://argoproj.github.io/argo-helm/
+      chart: argo-cd
+      targetRevision: 7.8.23
+      helm:
+        values: |
+          global:
+            domain: argo.k8s.prrlvr.fr
+          configs:
+            cm:
+              url: https://argo.k8s.prrlvr.fr
+              application.instanceLabelKey: argocd.argoproj.io/instance
+              exec.enabled: true
+              admin.enabled: true
+              statusbadge.enabled: true
+              resource.ignoreResourceUpdatesEnabled: true
+              resource.customizations.ignoreResourceUpdates.external-secrets.io_ExternalSecret: |
+                jsonPointers:
+                  - /status/refreshTime
+              timeout.reconciliation.jitter: 60
+            rbac:
+              policy.default: role:readonly
+              policy.csv: |
+                g, argo-cd_admins, role:admin
+              scopes: "[groups]"
+            secret:
+              createSecret: false
+          controller:
+            metrics:
+              enabled: true
+              serviceMonitor:
+                enabled: true
+          dex:
+            enabled: false
+          server:
+            autoscaling:
+              enabled: true
+              targetCPUUtilizationPercentage: 90
+              targetMemoryUtilizationPercentage: 90
+            resources:
+              limits:
+                cpu: 100m
+                memory: 512Mi
+              requests:
+                cpu: 50m
+                memory: 256Mi
+            pdb:
+              enabled: true
+              minAvailable: 1
+            metrics:
+              enabled: true
+              serviceMonitor:
+                enabled: true
+            ingress:
+              enabled: true
+              annotations:
+                cert-manager.io/cluster-issuer: letsencrypt
+                cert-manager.io/revision-history-limit: "1"
+                nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+              ingressClassName: nginx
+              hostname: argo.k8s.prrlvr.fr
+              tls: true
+              https: true
+            repoServer:
+              autoscaling:
+                enabled: true
+                minReplicas: 2
+                targetCPUUtilizationPercentage: 90
+                targetMemoryUtilizationPercentage: 90
+              resources:
+                limits:
+                  cpu: 200m
+                  memory: 512Mi
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+              pdb:
+                enabled: true
+                minAvailable: 1
+              metrics:
+                enabled: true
+                serviceMonitor:
+                  enabled: true
+            applicationSet:
+              metrics:
+                enabled: true
+                serviceMonitor:
+                  enabled: true
+

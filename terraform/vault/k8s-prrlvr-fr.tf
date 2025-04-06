@@ -66,3 +66,15 @@ resource "vault_kubernetes_auth_backend_role" "external-secrets-vault-k8s-prrlvr
   token_policies                   = [vault_policy.external-secrets-vault-k8s-prrlvr-fr.name]
   token_no_default_policy          = false
 }
+
+resource "vault_mount" "k8s-prrlvr-fr-kvv2" {
+  path    = "k8s-prrlvr-fr"
+  type    = "kv"
+  options = { version = "2" }
+}
+
+resource "vault_kv_secret_backend_v2" "k8s-prrlvr-fr" {
+  mount        = vault_mount.k8s-prrlvr-fr-kvv2.path
+  max_versions = 10
+  cas_required = false
+}
