@@ -5,6 +5,7 @@ namespace: argocd
 resources:
   # - argocd.yml
   - cert-manager.yml
+  - coredns.yml
   - cnpg.yml
   - echo.yml
   - external-secrets.yml
