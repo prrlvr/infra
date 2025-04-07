@@ -23,10 +23,10 @@ spec:
       helm:
         values: |
           global:
-            domain: argo.k8s.prrlvr.fr
+            domain: argocd.prrlvr.fr
           configs:
             cm:
-              url: https://argo.k8s.prrlvr.fr
+              url: https://argocd.prrlvr.fr
               application.instanceLabelKey: argocd.argoproj.io/instance
               exec.enabled: true
               admin.enabled: true
@@ -42,7 +42,7 @@ spec:
                 g, argo-cd_admins, role:admin
               scopes: "[groups]"
             secret:
-              createSecret: false
+              createSecret: true
           controller:
             metrics:
               enabled: true
@@ -76,7 +76,7 @@ spec:
                 cert-manager.io/revision-history-limit: "1"
                 nginx.ingress.kubernetes.io/backend-protocol: HTTPS
               ingressClassName: nginx
-              hostname: argo.k8s.prrlvr.fr
+              hostname: argocd.prrlvr.fr
               tls: true
             repoServer:
               autoscaling:
