@@ -11,6 +11,7 @@ resources:
   - external-secrets.yml
   - grafana.yml
   - ingress-nginx.yml
+  - kube-prometheus-stack.yml
   - nfs.yml
   - pgadmin.yml
   - vault.yml

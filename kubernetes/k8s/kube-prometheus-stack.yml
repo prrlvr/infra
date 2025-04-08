@@ -1,0 +1,91 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  annotations:
+    argocd.argoproj.io/manifest-generate-paths: .
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    name: in-cluster
+    namespace: monitoring
+  project: default
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    automated:
+      prune: true
+      selfHeal: true
+  sources:
+    - repoURL: https://github.com/prrlvr/infra.git
+      targetRevision: HEAD
+      path: kubernetes/apps/k8s/prometheus
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: kube-prometheus-stack
+      targetRevision: 70.4.2
+      helm:
+        valuesObject:
+          prometheusOperator:
+            enabled: true
+            clusterDomain: k8s.cluster.local
+          alertmanager:
+            enabled: true
+            forceDeployDashboards: true
+            ingress:
+              enabled: true
+              ingressClassName: nginx
+              annotations:
+                cert-manager.io/cluster-issuer: letsencrypt
+              path: /
+              pathType: Prefix
+              hosts:
+                - alertmanager.k8s.prrlvr.fr
+              tls:
+                - hosts:
+                    - alertmanager.k8s.prrlvr.fr
+                  secretName: alertmanager-k8s-tls
+
+          kubeControllerManager:
+            service:
+              selector:
+                k8s-app: kube-controller-manager
+          kubeScheduler:
+            service:
+              selector:
+                k8s-app: kube-scheduler
+
+          grafana:
+            enabled: false
+            forceDeployDashboards: true
+            sidecar:
+              dashboards:
+                annotations:
+                  k8s-sidecar-target-directory: /tmp/dashboards/kubernetes
+                multicluster:
+                  global:
+                    enabled: true
+                  etcd:
+                    enabled: true
+
+          prometheus:
+            prometheusSpec:
+              ruleSelectorNilUsesHelmValues: false
+              serviceMonitorSelectorNilUsesHelmValues: false
+              podMonitorSelectorNilUsesHelmValues: false
+              storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: freenas-nfs-csi
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 20Gi
+              containers:
+                - name: prometheus
+                  startupProbe:
+                    failureThreshold: 60
+                    periodSeconds: 30
+                    initialDelaySeconds: 120
