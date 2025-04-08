@@ -72,6 +72,17 @@ spec:
             userKey: username
             passwordKey: password
 
+          datasources:
+           datasources.yaml:
+            apiVersion: 1
+            datasources:
+            - name: Prometheus
+              type: prometheus
+              orgId: 1
+              editable: false
+              url: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+              isDefault: true
+
           sidecar:
             dashboards:
               enabled: true
