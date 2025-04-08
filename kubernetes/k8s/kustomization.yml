@@ -9,6 +9,7 @@ resources:
   - cnpg.yml
   - echo.yml
   - external-secrets.yml
+  - grafana.yml
   - ingress-nginx.yml
   - nfs.yml
   - pgadmin.yml

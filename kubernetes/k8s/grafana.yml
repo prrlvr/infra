@@ -1,0 +1,119 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: grafana
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    name: in-cluster
+    namespace: monitoring
+  project: default
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
+  sources:
+    - repoURL: https://github.com/prrlvr/infra.git
+      targetRevision: HEAD
+      path: kubernetes/apps/k8s/grafana
+    - repoURL: https://grafana.github.io/helm-charts
+      chart: grafana
+      targetRevision: 8.11.3
+      helm:
+        releaseName: grafana
+        valuesObject:
+          replicas: 2
+          headlessService: true
+          podDisruptionBudget:
+            minAvailable: 1
+          service:
+            enabled: true
+            type: ClusterIP
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt
+            path: /
+            pathType: Prefix
+            hosts:
+              - grafana.k8s.prrlvr.fr
+            tls:
+              - hosts:
+                  - grafana.k8s.prrlvr.fr
+                secretName: grafana-k8s-tls
+          serviceMonitor:
+            enabled: false
+            path: /metrics
+            interval: 30s
+            scheme: http
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          persistence:
+            type: pvc
+            enabled: true
+            storageClassName: freenas-nfs-csi
+            accessModes:
+              - ReadWriteMany
+            size: 10Gi
+          initChownData:
+            enabled: false
+          admin:
+            existingSecret: grafana-admin-creds
+            userKey: username
+            passwordKey: password
+
+          sidecar:
+            dashboards:
+              enabled: true
+              provider:
+                foldersFromFilesStructure: true
+              multicluster:
+                global:
+                  enabled: true
+              annotations:
+                k8s-sidecar-target-directory: "/tmp/dashboards/kubernetes"
+            datasources:
+              defaultDatasourceEnabled: false
+
+          dashboardProviders:
+            dashboardproviders.yaml:
+              apiVersion: 1
+              providers:
+              - name: 'grafana-dashboards-kubernetes'
+                orgId: 1
+                folder: 'Kubernetes'
+                type: file
+                disableDeletion: true
+                editable: true
+                options:
+                  path: /var/lib/grafana/dashboards/grafana-dashboards-kubernetes
+          dashboards:
+            grafana-dashboards-kubernetes:
+              k8s-system-api-server:
+                url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-api-server.json
+                token: ''
+              k8s-system-coredns:
+                url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-coredns.json
+                token: ''
+              k8s-views-global:
+                url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-global.json
+                token: ''
+              k8s-views-namespaces:
+                url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json
+                token: ''
+              k8s-views-nodes:
+                url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-nodes.json
+                token: ''
+              k8s-views-pods:
+                url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json
+                token: ''
