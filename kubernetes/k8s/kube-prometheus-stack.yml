@@ -31,6 +31,23 @@ spec:
           prometheusOperator:
             enabled: true
             clusterDomain: k8s.cluster.local
+            # see https://github.com/prometheus-community/helm-charts/issues/4500, waiting for argocd 3.0
+            admissionWebhooks:
+              enabled: true
+              annotations:
+                argocd.argoproj.io/hook: PreSync
+                argocd.argoproj.io/hook-delete-policy: HookFailed
+              patch:
+                annotations:
+                  argocd.argoproj.io/hook: PreSync
+                  argocd.argoproj.io/hook-delete-policy: HookFailed
+              mutatingWebhookConfiguration:
+                annotations:
+                  argocd.argoproj.io/hook: PreSync
+              validatingWebhookConfiguration:
+                annotations:
+                  argocd.argoproj.io/hook: PreSync
+
           alertmanager:
             enabled: true
             forceDeployDashboards: true
