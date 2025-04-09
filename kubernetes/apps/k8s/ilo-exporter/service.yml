@@ -8,7 +8,7 @@ spec:
   ports:
     - name: metrics
       port: 9090
-      targetPort: 9495
+      targetPort: 9545
   selector:
     app: ilo-exporter
 
