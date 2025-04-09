@@ -92,6 +92,9 @@ spec:
               ruleSelectorNilUsesHelmValues: false
               serviceMonitorSelectorNilUsesHelmValues: false
               podMonitorSelectorNilUsesHelmValues: false
+              scrapeConfigSelector:
+                matchLabels:
+                  prometheus: system-monitoring-prometheus
               storageSpec:
               volumeClaimTemplate:
                 spec:

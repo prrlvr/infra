@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ilo-exporter
+  namespace: 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ilo-exporter
+  template:
+    metadata:
+      labels:
+        app: ilo-exporter
+    spec:
+      containers:
+        - image: ghcr.io/prrlvr/infra-ilo4-exporter:latest
+          imagePullPolicy: Always
+          name: ilo-exporter
+          resources:
+            requests:
+              memory: 50Mi
+              cpu: 100m
+            limits:
+              cpu: 200m
+              memory: 100Mi
+          ports:
+            - containerPort: 9495
+          env:
+          - name: API_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: ilo-metrics-creds
+                key: username
+          - name: API_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: ilo-metrics-creds
+                key: password
+

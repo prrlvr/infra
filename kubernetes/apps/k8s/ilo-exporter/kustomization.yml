@@ -1,0 +1,8 @@
+---
+kind: Kustomization
+namespace: monitoring
+
+resources:
+  - deployment.yml
+  - secrets.yml
+  - service.yml
