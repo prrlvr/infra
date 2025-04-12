@@ -1,0 +1,153 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rook-ceph-cluster
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    name: in-cluster
+    namespace: rook-ceph
+  project: default
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
+  sources:
+    - repoURL: https://github.com/prrlvr/infra.git
+      targetRevision: HEAD
+      path: kubernetes/apps/k8s/rook-ceph-operator
+    - repoURL: https://charts.rook.io/release
+      chart: rook-ceph-cluster
+      targetRevision: v1.16.6
+      helm:
+        releaseName: rook-ceph
+        valuesObject:
+          operatorNamespace: rook-ceph
+          monitoring:
+            enabled: true
+            metricsDisabled: false
+            createPrometheusRules: true
+            rulesNamespaceOverride: monitoring
+            interval: 10s
+          cephClusterSpec:
+            cephVersion:
+              image: quay.io/ceph/ceph:v19.2.1
+              allowUnsupported: false
+            upgradeOSDRequiresHealthyPGs: true
+            mon:
+              count: 3
+              allowMultiplePerNode: false
+            mgr:
+              count: 2
+              allowMultiplePerNode: false
+          ingress:
+            dashboard:
+              ingressClassName: nginx
+              annotations:
+                nginx.ingress.kubernetes.io/rewrite-target: /ceph-dashboard/$2
+                cert-manager.io/cluster-issuer: letsencrypt
+                nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+                nginx.ingress.kubernetes.io/server-snippet: |
+                  proxy_ssl_verify off;
+              host:
+                name: ceph.k8s.prrlvr.fr
+                path: "/ceph-dashboard(/|$)(.*)"
+                pathType: Prefix
+              tls:
+              - hosts:
+                  - ceph.k8s.prrlvr.fr
+                secretName: ceph-dashboard-tls
+
+          cephBlockPools:
+            - name: ceph-blockpool
+              spec:
+                failureDomain: host
+                replicated:
+                  size: 2
+                # For reference: https://docs.ceph.com/docs/latest/mgr/prometheus/#rbd-io-statistics
+                enableRBDStats: true
+              storageClass:
+                enabled: true
+                name: ceph-block-delete
+                annotations: {}
+                isDefault: true
+                reclaimPolicy: Delete
+                allowVolumeExpansion: true
+                parameters:
+                  imageFormat: "2"
+                  csi.storage.k8s.io/fstype: ext4
+
+          cephFileSystems:
+            - name: ceph-filesystem
+              spec:
+                metadataPool:
+                  replicated:
+                    size: 2
+                dataPools:
+                  - failureDomain: host
+                    replicated:
+                      size: 2
+                    # Optional and highly recommended, 'data0' by default, see https://github.com/rook/rook/blob/master/Documentation/CRDs/Shared-Filesystem/ceph-filesystem-crd.md#pools
+                    name: data0
+                metadataServer:
+                  activeCount: 1
+                  activeStandby: true
+                  resources:
+                    limits:
+                      memory: "4Gi"
+                    requests:
+                      cpu: "1000m"
+                      memory: "4Gi"
+                  priorityClassName: system-cluster-critical
+              storageClass:
+                enabled: true
+                isDefault: false
+                name: ceph-filesystem-delete
+                # (Optional) specify a data pool to use, must be the name of one of the data pools above, 'data0' by default
+                pool: data0
+                reclaimPolicy: Delete
+                allowVolumeExpansion: true
+                volumeBindingMode: "Immediate"
+                parameters:
+                  csi.storage.k8s.io/fstype: ext4
+
+          cephObjectStores:
+            - name: ceph-objectstore
+              spec:
+                metadataPool:
+                  failureDomain: host
+                  replicated:
+                    size: 2
+                dataPool:
+                  failureDomain: host
+                  erasureCoded:
+                    dataChunks: 2
+                    codingChunks: 1
+                  parameters:
+                    bulk: "true"
+                preservePoolsOnDelete: true
+                gateway:
+                  port: 80
+                  resources:
+                    limits:
+                      memory: "2Gi"
+                    requests:
+                      cpu: "5000m"
+                      memory: "500Mi"
+                  # securePort: 443
+                  # sslCertificateRef:
+                  instances: 1
+                  priorityClassName: system-cluster-critical
+              storageClass:
+                enabled: true
+                name: ceph-bucket-delete
+                reclaimPolicy: Delete
+                volumeBindingMode: "Immediate"
+                parameters:
+                  region: eu-west-par
+              ingress:
+                enabled: false
