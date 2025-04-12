@@ -26,10 +26,8 @@ spec:
       helm:
         releaseName: grafana
         valuesObject:
-          replicas: 2
+          replicas: 1
           headlessService: true
-          podDisruptionBudget:
-            minAvailable: 1
           service:
             enabled: true
             type: ClusterIP
