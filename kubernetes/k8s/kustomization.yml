@@ -15,4 +15,5 @@ resources:
   - kube-prometheus-stack.yml
   - nfs.yml
   - pgadmin.yml
+  - rook-ceph-operator.yml
   - vault.yml
