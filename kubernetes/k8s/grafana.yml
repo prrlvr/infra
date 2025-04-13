@@ -45,7 +45,7 @@ spec:
                   - grafana.k8s.prrlvr.fr
                 secretName: grafana-k8s-tls
           serviceMonitor:
-            enabled: false
+            enabled: true
             path: /metrics
             interval: 30s
             scheme: http
@@ -58,7 +58,7 @@ spec:
               memory: 128Mi
           persistence:
             type: pvc
-            enabled: true
+            enabled: false
             storageClassName: freenas-nfs-csi
             accessModes:
               - ReadWriteMany
