@@ -120,39 +120,39 @@ spec:
                 parameters:
                   csi.storage.k8s.io/fstype: ext4
 
-          cephObjectStores:
-            - name: ceph-objectstore
-              spec:
-                metadataPool:
-                  failureDomain: host
-                  replicated:
-                    size: 2
-                dataPool:
-                  failureDomain: host
-                  erasureCoded:
-                    dataChunks: 2
-                    codingChunks: 1
-                  parameters:
-                    bulk: "true"
-                preservePoolsOnDelete: true
-                gateway:
-                  port: 80
-                  resources:
-                    limits:
-                      memory: "2Gi"
-                    requests:
-                      cpu: "5000m"
-                      memory: "500Mi"
-                  # securePort: 443
-                  # sslCertificateRef:
-                  instances: 1
-                  priorityClassName: system-cluster-critical
-              storageClass:
-                enabled: true
-                name: ceph-bucket-delete
-                reclaimPolicy: Delete
-                volumeBindingMode: "Immediate"
-                parameters:
-                  region: eu-west-par
-              ingress:
-                enabled: false
+          # cephObjectStores:
+          #   - name: ceph-objectstore
+          #     spec:
+          #       metadataPool:
+          #         failureDomain: host
+          #         replicated:
+          #           size: 2
+          #       dataPool:
+          #         failureDomain: host
+          #         erasureCoded:
+          #           dataChunks: 2
+          #           codingChunks: 1
+          #         parameters:
+          #           bulk: "true"
+          #       preservePoolsOnDelete: true
+          #       gateway:
+          #         port: 80
+          #         resources:
+          #           limits:
+          #             memory: "2Gi"
+          #           requests:
+          #             cpu: "5000m"
+          #             memory: "500Mi"
+          #         # securePort: 443
+          #         # sslCertificateRef:
+          #         instances: 1
+          #         priorityClassName: system-cluster-critical
+          #     storageClass:
+          #       enabled: true
+          #       name: ceph-bucket-delete
+          #       reclaimPolicy: Delete
+          #       volumeBindingMode: "Immediate"
+          #       parameters:
+          #         region: eu-west-par
+          #     ingress:
+          #       enabled: false
