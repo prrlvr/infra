@@ -30,6 +30,11 @@ spec:
             createPrometheusRules: true
             rulesNamespaceOverride: monitoring
             interval: 10s
+          configOverride: |
+            [global]
+            mon_allow_pool_delete = true
+            osd_pool_default_size = 2
+            osd_pool_default_min_size = 2
           toolbox:
             enabled: true
           cephClusterSpec:
