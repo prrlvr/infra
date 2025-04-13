@@ -17,9 +17,6 @@ spec:
       prune: true
       selfHeal: true
   sources:
-    - repoURL: https://github.com/prrlvr/infra.git
-      targetRevision: HEAD
-      path: kubernetes/apps/k8s/rook-ceph-operator
     - repoURL: https://charts.rook.io/release
       chart: rook-ceph-cluster
       targetRevision: v1.16.6
@@ -44,13 +41,19 @@ spec:
             mgr:
               count: 2
               allowMultiplePerNode: false
+          dashboard:
+            enabled: true
+            urlPrefix: /ceph-dashboard
+            ssl: true
           ingress:
             dashboard:
               ingressClassName: nginx
               annotations:
-                nginx.ingress.kubernetes.io/rewrite-target: /ceph-dashboard/$2
                 cert-manager.io/cluster-issuer: letsencrypt
+                nginx.ingress.kubernetes.io/rewrite-target: /ceph-dashboard/$2
                 nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+                nginx.ingress.kubernetes.io/configuration-snippet: |
+                  proxy_ssl_protocols TLSv1.3;
                 nginx.ingress.kubernetes.io/server-snippet: |
                   proxy_ssl_verify off;
               host:
