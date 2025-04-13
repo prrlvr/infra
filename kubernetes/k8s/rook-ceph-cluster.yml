@@ -30,6 +30,8 @@ spec:
             createPrometheusRules: true
             rulesNamespaceOverride: monitoring
             interval: 10s
+          toolbox:
+            enabled: true
           cephClusterSpec:
             cephVersion:
               image: quay.io/ceph/ceph:v19.2.1
