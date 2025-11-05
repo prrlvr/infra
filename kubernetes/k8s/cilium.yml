@@ -66,9 +66,9 @@ spec:
           enabled: true
 
          bgpControlPlane:
-           enabled: false
+           enabled: true
          envoy:
-          enabled: false
+          enabled: true
          socketLB:
            hostNamespaceOnly: true
          prometheus:
@@ -130,9 +130,9 @@ spec:
                enabled: false
 
          l2announcements:
-           enabled: true
+           enabled: false
            interfaces:
-             - '^enx.*$'
+             - '^enX.*$'
            loadBalancer:
              mode: dsr
              acceleration: native
