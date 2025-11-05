@@ -13,11 +13,13 @@ spec:
   sources:
     - repoURL: https://coredns.github.io/helm
       chart: coredns
-      targetRevision: 1.39.2
+      targetRevision: 1.45.0
       helm:
         releaseName: coredns
         values: |
           replicaCount: 2
+          service:
+            clusterIP: 10.96.96.96
           hpa:
             enabled: true
             minReplicas: 2
@@ -54,8 +56,7 @@ spec:
               - name: ready
               # Required to query kubernetes API for data
               - name: kubernetes
-                # parameters: k8s.prrlvr.local in-addr.arpa ip6.arpa
-                parameters: cluster.local in-addr.arpa ip6.arpa
+                parameters: kube.prrlvr.local in-addr.arpa ip6.arpa
                 configBlock: |-
                   pods insecure
                   fallthrough in-addr.arpa ip6.arpa

@@ -3,4 +3,4 @@ kind: Kustomization
 namespace: argocd
 
 resources:
-  - k3s.yml
+  - k8s.yml

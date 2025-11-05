@@ -1,0 +1,7 @@
+---
+kind: Kustomization
+namespace: kube-system
+
+resources:
+  - l2announcement.yml
+  - lb-ip-pool.yml

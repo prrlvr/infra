@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: envoy-gateway
+  namespace: argocd
+spec:
+  destination:
+    namespace: envoy-gateway-system
+    name: in-cluster
+  project: default
+  source:
+    - helm:
+        valuesObject:
+          kubernetesClusterDomain: kube.prrlvr.local
+          config:
+            envoyGateway:
+              provider:
+                kubernetes:
+                  deploy:
+                    type: GatewayNamespace
+          deployment:
+            envoyGateway:
+              resources:
+                limits:
+                  cpu: 700m
+                  memory: 256Mi
+      chart: gateway-helm
+      path: gateway-helm
+      repoURL: docker.io/envoyproxy
+      targetRevision: v1.5.4
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+    automated:
+      prune: true
+      selfHeal: true

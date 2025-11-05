@@ -21,8 +21,7 @@ spec:
           podDnsPolicy: "None"
           podDnsConfig:
             nameservers:
-              - "10.0.40.1"
-              - "1.1.1.1"
+              - "10.0.30.5"
     - repoURL: https://aureq.github.io/cert-manager-webhook-ovh/
       chart: cert-manager-webhook-ovh
       targetRevision: v0.7.3
