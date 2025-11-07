@@ -132,7 +132,7 @@ spec:
                 enabled: false
 
           l2announcements:
-            enabled: false
+            enabled: true
             interfaces:
               - "^enX.*$"
             loadBalancer:
