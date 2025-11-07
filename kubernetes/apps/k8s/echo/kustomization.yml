@@ -1,0 +1,9 @@
+---
+kind: Kustomization
+namespace: echo
+
+resources:
+  - deployment.yml
+  - http-route.yml
+  - namespace.yml
+  - service.yml

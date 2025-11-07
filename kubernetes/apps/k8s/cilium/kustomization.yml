@@ -1,7 +1,9 @@
 ---
 kind: Kustomization
-namespace: kube-system
+namespace: cilium
 
 resources:
+  - gateways.yml
   - l2announcement.yml
   - lb-ip-pool.yml
+  - namespace.yml

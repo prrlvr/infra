@@ -7,7 +7,3 @@ spec:
   blocks:
     - start: 10.0.30.130
       stop: 10.0.30.145
-  serviceSelector:
-    matchLabels:
-      lb-pool: default
-
