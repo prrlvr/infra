@@ -1,10 +1,14 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: http-route-echo
+  name: https-route-echo
 spec:
+  hostnames:
+    - k8s.prrlvr.fr
   parentRefs:
     - name: cilium-eg
+      namespace: cilium
+      section-name: https-echo
   rules:
     - backendRefs:
         - name: echo
