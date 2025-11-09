@@ -32,9 +32,9 @@ spec:
               admin.enabled: true
               statusbadge.enabled: true
               resource.ignoreResourceUpdatesEnabled: true
-              resource.customizations.ignoreResourceUpdates.external-secrets.io_ExternalSecret: |
-                jsonPointers:
-                  - /status/refreshTime
+              # resource.customizations.ignoreResourceUpdates.external-secrets.io_ExternalSecret: |
+              #   jsonPointers:
+              #     - /status/refreshTime
               timeout.reconciliation.jitter: 60
             rbac:
               policy.default: role:readonly
@@ -70,14 +70,13 @@ spec:
               serviceMonitor:
                 enabled: true
             ingress:
+              enabled: false
+            httproute:
               enabled: true
-              annotations:
-                cert-manager.io/cluster-issuer: letsencrypt
-                cert-manager.io/revision-history-limit: "1"
-                nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-              ingressClassName: nginx
-              hostname: argocd.prrlvr.fr
-              tls: true
+              parentRefs:
+                - name: cilium-eg
+                  namespace: cilium
+                  sectionName: https
             repoServer:
               autoscaling:
                 enabled: true
@@ -103,4 +102,3 @@ spec:
                 enabled: true
                 serviceMonitor:
                   enabled: true
-

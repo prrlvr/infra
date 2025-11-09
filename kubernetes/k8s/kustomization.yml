@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: argocd
 
 resources:
-  # - argocd.yml
+  - argocd.yml
   - cilium.yml
   - cert-manager.yml
   - coredns.yml

@@ -19,3 +19,14 @@ spec:
         certificateRefs:
           - kind: Secret
             name: echo-k8s-tls
+    - protocol: HTTPS
+      port: 443
+      name: https
+      hostname: "*.prrlvr.fr"
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        certificateRefs:
+          - kind: Secret
+            name: wildcard-prrlvr-tls
