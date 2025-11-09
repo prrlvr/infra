@@ -8,7 +8,8 @@ spec:
   parentRefs:
     - name: cilium-eg
       namespace: cilium
-      section-name: https-echo
+      group: gateway.networking.k8s.io
+      kind: Gateway
   rules:
     - backendRefs:
         - name: echo
