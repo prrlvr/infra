@@ -13,7 +13,7 @@ resources:
   # - grafana.yml
   # - ilo-exporter.yml
   # - kube-prometheus-stack.yml
-  # - nfs.yml
+  - truenas-iscsi.yml
   # - pgadmin.yml
   # - rook-ceph-cluster.yml
   # - rook-ceph-operator.yml

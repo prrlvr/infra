@@ -1,0 +1,120 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: csi-truenas-driver
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    name: in-cluster
+    namespace: storage
+  project: default
+  sources:
+    - repoURL: https://github.com/prrlvr/infra.git
+      targetRevision: HEAD
+      path: kubernetes/apps/k8s/democratic-csi
+    - repoURL: https://democratic-csi.github.io/charts/
+      chart: democratic-csi
+      targetRevision: 0.15.0
+      helm:
+        values: |
+            controller:
+              driver:
+                enabled: true
+                image:
+                  registry: docker.io/democraticcsi/democratic-csi
+                  tag: next # waiting for 1.9.5 release
+                  imagePullPolicy: Always
+            csiDriver:
+              name: "democratic-csi-api"
+              fsGroupPolicy: File
+            node:
+              hostPID: true
+              driver:
+                extraEnv:
+                  - name: ISCSIADM_HOST_STRATEGY
+                    value: nsenter
+                  - name: ISCSIADM_HOST_PATH
+                    value: /usr/local/sbin/iscsiadm
+                iscsiDirHostPath: /var/iscsi
+                iscsiDirHostPathType: ""
+
+            storageClasses:
+              # - name: truenas-nfs-slow
+              #   defaultClass: false
+              #   reclaimPolicy: Retain
+              #   volumeBindingMode: Immediate
+              #   allowVolumeExpansion: true
+              #   parameters:
+              #     fsType: nfs
+              #   mountOptions:
+              #     - noatime
+              #     - nfsvers=4
+              #   secrets:
+              #     provisioner-secret:
+              #     controller-publish-secret:
+              #     node-stage-secret:
+              #     node-publish-secret:
+              #     controller-expand-secret:
+
+              - name: truenas-iscsi-fast
+                defaultClass: true
+                reclaimPolicy: Retain
+                volumeBindingMode: Immediate
+                allowVolumeExpansion: true
+                parameters:
+                  fsType: ext4
+                mountOptions:
+                  - noatime
+                  - nfsvers=4
+                secrets:
+                  provisioner-secret:
+                  controller-publish-secret:
+                  node-stage-secret:
+                  node-publish-secret:
+                  controller-expand-secret:
+            volumeSnapshotClasses: []
+            driver:
+              config:
+                driver: freenas-api-iscsi
+                instance_id:
+                httpConnection:
+                  protocol: http
+                  host: truenas.prrlvr.local
+                  port: 80
+                  username: k8s
+                  password: k8spassword
+                  allowInsecure: true
+                zfs:
+                  datasetProperties: 
+                    "org.freenas:description": "{{ parameters.[csi.storage.k8s.io/pvc/namespace] }}/{{ parameters.[csi.storage.k8s.io/pvc/name] }}"
+                  datasetParentName: pool-ssd/k8s/pvc
+                  detachedSnapshotsDatasetParentName: pool-ssd/k8s/snap
+                  datasetEnableQuotas: true
+                  datasetEnableReservation: false
+                  datasetPermissionsMode: "0777"
+                  datasetPermissionsUser: 0
+                  datasetPermissionsGroup: 0
+                iscsi:
+                  targetPortal: truenas.prrlvr.local:3260
+                  interface: enX0
+                  nameTemplate: "{{ parameters.[csi.storage.k8s.io/pvc/namespace] }}-{{ parameters.[csi.storage.k8s.io/pvc/name] }}"
+                  namePrefix: csi-
+                  nameSuffix: ""
+                  targetGroups:
+                    - targetGroupPortalGroup: 2
+                      targetGroupInitiatorGroup: 2
+                      targetGroupAuthType: None
+
+                  extentCommentTemplate: "{{ parameters.[csi.storage.k8s.io/pvc/namespace] }}/{{ parameters.[csi.storage.k8s.io/pvc/name] }}"
+                  extentInsecureTpc: true
+                  extentXenCompat: false
+                  extentDisablePhysicalBlocksize: true
+                  extentBlocksize: 512
+                  extentRpm: "SSD"
+                  extentAvailThreshold: 0
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
