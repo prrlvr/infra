@@ -41,23 +41,6 @@ spec:
                 iscsiDirHostPathType: ""
 
             storageClasses:
-              # - name: truenas-nfs-slow
-              #   defaultClass: false
-              #   reclaimPolicy: Retain
-              #   volumeBindingMode: Immediate
-              #   allowVolumeExpansion: true
-              #   parameters:
-              #     fsType: nfs
-              #   mountOptions:
-              #     - noatime
-              #     - nfsvers=4
-              #   secrets:
-              #     provisioner-secret:
-              #     controller-publish-secret:
-              #     node-stage-secret:
-              #     node-publish-secret:
-              #     controller-expand-secret:
-
               - name: truenas-iscsi-fast
                 defaultClass: true
                 reclaimPolicy: Retain
@@ -65,9 +48,6 @@ spec:
                 allowVolumeExpansion: true
                 parameters:
                   fsType: ext4
-                mountOptions:
-                  - noatime
-                  - nfsvers=4
                 secrets:
                   provisioner-secret:
                   controller-publish-secret:
