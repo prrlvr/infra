@@ -17,88 +17,13 @@ spec:
       prune: true
       selfHeal: true
   sources:
+    - repoURL: https://github.com/prrlvr/infra.git
+      targetRevision: HEAD
+      path: kubernetes/apps/k8s/argocd
+      ref: infra
     - repoURL: https://argoproj.github.io/argo-helm/
       chart: argo-cd
       targetRevision: 9.1.0
       helm:
-        values: |
-          global:
-            domain: argocd.prrlvr.fr
-          configs:
-            cm:
-              url: https://argocd.prrlvr.fr
-              application.instanceLabelKey: argocd.argoproj.io/instance
-              exec.enabled: true
-              admin.enabled: true
-              statusbadge.enabled: true
-              resource.ignoreResourceUpdatesEnabled: true
-              # resource.customizations.ignoreResourceUpdates.external-secrets.io_ExternalSecret: |
-              #   jsonPointers:
-              #     - /status/refreshTime
-              timeout.reconciliation.jitter: 60
-            rbac:
-              policy.default: role:readonly
-              policy.csv: |
-                g, argo-cd_admins, role:admin
-              scopes: "[groups]"
-            secret:
-              createSecret: true
-          controller:
-            metrics:
-              enabled: true
-              serviceMonitor:
-                enabled: true
-          dex:
-            enabled: false
-          server:
-            autoscaling:
-              enabled: true
-              targetCPUUtilizationPercentage: 90
-              targetMemoryUtilizationPercentage: 90
-            resources:
-              limits:
-                cpu: 100m
-                memory: 512Mi
-              requests:
-                cpu: 50m
-                memory: 256Mi
-            pdb:
-              enabled: true
-              minAvailable: 1
-            metrics:
-              enabled: true
-              serviceMonitor:
-                enabled: true
-            ingress:
-              enabled: false
-            httproute:
-              enabled: true
-              parentRefs:
-                - name: cilium-eg
-                  namespace: cilium
-                  sectionName: https
-            repoServer:
-              autoscaling:
-                enabled: true
-                minReplicas: 2
-                targetCPUUtilizationPercentage: 90
-                targetMemoryUtilizationPercentage: 90
-              resources:
-                limits:
-                  cpu: 200m
-                  memory: 512Mi
-                requests:
-                  cpu: 100m
-                  memory: 256Mi
-              pdb:
-                enabled: true
-                minAvailable: 1
-              metrics:
-                enabled: true
-                serviceMonitor:
-                  enabled: true
-            applicationSet:
-              metrics:
-                enabled: true
-                serviceMonitor:
-                  enabled: true
+        valueFiles:
+          - $infra/kubernetes/apps/k8s/argocd/values.yml

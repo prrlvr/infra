@@ -1,0 +1,83 @@
+global:
+  domain: argocd.prrlvr.fr
+configs:
+  params:
+    server.insecure: true
+  cm:
+    url: https://argocd.prrlvr.fr
+    application.instanceLabelKey: argocd.argoproj.io/instance
+    exec.enabled: true
+    admin.enabled: true
+    statusbadge.enabled: true
+    resource.ignoreResourceUpdatesEnabled: true
+    timeout.reconciliation.jitter: 60
+  rbac:
+    policy.default: role:readonly
+    policy.csv: |
+      g, argo-cd_admins, role:admin
+    scopes: "[groups]"
+  secret:
+    createSecret: true
+controller:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+dex:
+  enabled: false
+server:
+  autoscaling:
+    enabled: true
+    targetCPUUtilizationPercentage: 90
+    targetMemoryUtilizationPercentage: 90
+  resources:
+    limits:
+      cpu: 100m
+      memory: 512Mi
+    requests:
+      cpu: 50m
+      memory: 256Mi
+  pdb:
+    enabled: true
+    minAvailable: 1
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+  ingress:
+    enabled: false
+  httproute:
+    enabled: true
+    hostnames:
+      - argocd.prrlvr.fr
+    parentRefs:
+      - name: cilium-eg
+        namespace: cilium
+        sectionName: https
+        group: gateway.networking.k8s.io
+        kind: Gateway
+  repoServer:
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      targetCPUUtilizationPercentage: 90
+      targetMemoryUtilizationPercentage: 90
+    resources:
+      limits:
+        cpu: 200m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+    pdb:
+      enabled: true
+      minAvailable: 1
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+  applicationSet:
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
