@@ -14,6 +14,7 @@ resources:
   # - ilo-exporter.yml
   # - kube-prometheus-stack.yml
   - truenas-iscsi.yml
+  - truenas-nfs.yml
   # - pgadmin.yml
   # - rook-ceph-cluster.yml
   # - rook-ceph-operator.yml
