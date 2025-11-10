@@ -1,0 +1,18 @@
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: vault
+spec:
+  hostnames:
+    - vault.k8s.prrlvr.fr
+  parentRefs:
+    - name: cilium-eg
+      namespace: cilium
+      group: gateway.networking.k8s.io
+      kind: Gateway
+      sectionName: vault-tls-passthrough
+  rules:
+    - backendRefs:
+        - name: vault
+          port: 8200

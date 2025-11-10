@@ -1,0 +1,13 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: vault-prrlvr-tls
+spec:
+  dnsNames:
+    - vault.k8s.prrlvr.fr
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: letsencrypt
+  secretName: vault-k8s-tls

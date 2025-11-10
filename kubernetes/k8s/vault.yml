@@ -11,9 +11,12 @@ spec:
     namespace: vault
   project: default
   sources:
+    - repoURL: https://github.com/prrlvr/infra.git
+      targetRevision: HEAD
+      path: kubernetes/apps/k8s/vault
     - repoURL: https://helm.releases.hashicorp.com
       chart: vault
-      targetRevision: 0.30.0
+      targetRevision: 0.31.0
       helm:
         values: |
           fullnameOverride: vault
@@ -23,9 +26,6 @@ spec:
           injector:
             enabled: false
           server:
-            image:
-              repository: hashicorp/vault
-              tag: 1.19.0
             standalone:
               enabled: true
               config: |
@@ -59,11 +59,11 @@ spec:
             dataStorage:
               enabled: true
               size: 5Gi
-              storageClass: freenas-nfs-csi
+              storageClass: truenas-nfs-slow
             auditStorage:
               enabled: true
               size: 5Gi
-              storageClass: freenas-nfs-csi
+              storageClass: truenas-nfs-slow
             readinessProbe:
               enabled: true
               path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204"
@@ -71,18 +71,7 @@ spec:
               type: NodePort
               nodePort: 30820
             ingress:
-              enabled: true 
-              ingressClassName: nginx
-              annotations:
-                nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-                cert-manager.io/cluster-issuer: letsencrypt
-                nginx.ingress.kubernetes.io/ssl-passthrough: "true"
-              hosts:
-                - host: vault.k8s.prrlvr.fr
-              tls:
-                - hosts:
-                    - vault.k8s.prrlvr.fr
-                  secretName: vault-k8s-tls
+              enabled: false 
           serverTelemetry:
             serviceMonitor:
               enabled: false

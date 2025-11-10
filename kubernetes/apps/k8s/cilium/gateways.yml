@@ -30,3 +30,12 @@ spec:
         certificateRefs:
           - kind: Secret
             name: wildcard-prrlvr-tls
+    - protocol: TLS
+      port: 443
+      name: vault-tls-passthrough
+      hostname: "vault.k8s.prrlvr.fr"
+      tls:
+        mode: Passthrough
+      allowedRoutes:
+        namespaces:
+          from: All

@@ -1,0 +1,7 @@
+---
+kind: Kustomization
+namespace: vault
+
+resources:
+  - certificate.yml
+  - tls-route.yml

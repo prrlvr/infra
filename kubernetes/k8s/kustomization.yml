@@ -18,4 +18,4 @@ resources:
   # - pgadmin.yml
   # - rook-ceph-cluster.yml
   # - rook-ceph-operator.yml
-  # - vault.yml
+  - vault.yml
