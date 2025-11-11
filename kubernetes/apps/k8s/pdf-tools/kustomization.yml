@@ -1,0 +1,6 @@
+---
+kind: Kustomization
+namespace: pdf-tools
+
+resources:
+  - http-route.yml

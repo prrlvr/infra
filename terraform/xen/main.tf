@@ -7,7 +7,7 @@ terraform {
 
   backend "s3" {
     bucket                      = "s3-infra-backup"
-    key                         = "infra-xen.tfstate"
+    key                         = "infra-xen-prrlvr.tfstate"
     region                      = "eu-west-par"
     skip_credentials_validation = true
     skip_region_validation      = true
@@ -21,11 +21,7 @@ terraform {
 }
 
 provider "xenorchestra" {
-  url      = "ws://xoa.local"  # Or set XOA_URL environment variable
-  username = "admin@prrlvr.fr" # Or set XOA_USER environment variable
+  url      = "wss://xoa.prrlvr.local" # Or set XOA_URL environment variable
+  username = "admin@prrlvr.fr"        # Or set XOA_USER environment variable
   insecure = true
-}
-
-data "xenorchestra_network" "net" {
-  name_label = "Pool-wide network associated with eth0"
 }

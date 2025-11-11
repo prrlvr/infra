@@ -9,10 +9,12 @@ resources:
   - coredns.yml
   # - cnpg.yml
   - echo.yml
+  - external-dns.yml
   # - external-secrets.yml
   # - grafana.yml
   # - ilo-exporter.yml
   # - kube-prometheus-stack.yml
+  - pdf-tools.yml
   - truenas-iscsi.yml
   - truenas-nfs.yml
   # - pgadmin.yml

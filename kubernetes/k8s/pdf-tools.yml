@@ -1,0 +1,72 @@
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pdf-tools
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    name: in-cluster
+    namespace: pdf-tools
+  project: default
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
+  sources:
+    - repoURL: https://github.com/prrlvr/infra.git
+      targetRevision: HEAD
+      path: kubernetes/apps/k8s/pdf-tools
+    - repoURL: https://docs.stirlingpdf.com/Stirling-PDF-chart/
+      chart: stirling-pdf-chart
+      targetRevision: 2.2.0
+      helm:
+        valuesObject:
+          replicaCount: 1
+          strategy:
+            type: RollingUpdate
+          rootPath: /
+          envs:
+          - name: ALLOW_GOOGLE_VISIBILITY
+            value: "true"
+          - name: APP_LOCALE
+            value: "fr_FR"
+          service:
+            servicename: pdf-tools-service
+            type: ClusterIP
+            externalTrafficPolicy: Local
+            externalPort: 8080
+          serviceMonitor:
+            enabled: false
+            namespace: prometheus
+            labels: {}
+            metricsPath: "/metrics"
+            timeout: 60
+            interval: 60
+          
+          resources:
+           limits:
+             cpu: 100m
+             memory: 128Mi
+           requests:
+             cpu: 80m
+             memory: 64Mi
+          
+          serviceAccount:
+            create: true
+            name: ""
+            automountServiceAccountToken: false
+          
+          persistence:
+            enabled: true
+            accessMode: ReadWriteOnce
+            size: 8Gi
+            path: /tmp
+            storageClass: truenas-nfs-slow
+          
+          ingress:
+            enabled: false
