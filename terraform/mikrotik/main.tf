@@ -22,7 +22,7 @@ terraform {
 }
 
 provider "routeros" {
-  hosturl = "http://192.168.88.1" # env ROS_HOSTURL or MIKROTIK_HOST
+  hosturl = "http://192.168.1.1" # env ROS_HOSTURL or MIKROTIK_HOST
   # ca_certificate = "./cert"                      # env ROS_CA_CERTIFICATE or MIKROTIK_CA_CERTIFICATE
   insecure = true
 }

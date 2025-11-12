@@ -6,38 +6,28 @@ locals {
     mgmt  = 99,
   }
 
-  # lan_bridged_interfaces = [
-  #   {
-  #     interface = routeros_interface_ethernet.ether1.name
-  #     comment   = "PO"
-  #     pvid      = [local.pvids.home] # FIXME: not used
-  #   },
-  #   {
-  #     interface = routeros_interface_bonding.bonding_switch.name, # eth2 eth3
-  #     comment   = "switch bonding trunk"
-  #     pvid      = [local.pvids.guest, local.pvids.home, local.pvids.infra, local.pvids.mgmt] # FIXME: not used
-  #   },
-  #   {
-  #     interface = routeros_interface_ethernet.eth4.name
-  #     comment   = "WiFi AP"
-  #     pvid      = [local.pvids.guest, local.pvids.home] # FIXME: not used
-  #   },
-  #   {
-  #     interface = routeros_interface_ethernet.eth5.name
-  #     comment   = "DL380 mgmt"
-  #     pvid      = [local.pvids.mgmt] # FIXME: not used
-  #   },
-  #   {
-  #     interface = routeros_interface_bonding.bonding_dl380.name # eth6 eth7
-  #     comment   = "DL380 bonding trunk"
-  #     pvid      = [local.pvids.infra] # FIXME: not used
-  #   },
+  lan_bridged_interfaces = [
+    {
+      interface = routeros_interface_ethernet.ether1.name
+      comment   = "PO"
+      pvid      = [local.pvids.home]
+    },
+    {
+      interface = routeros_interface_bonding.bonding_switch.name, # eth2 eth3
+      comment   = "switch bonding trunk"
+      pvid      = [local.pvids.guest, local.pvids.home, local.pvids.infra, local.pvids.mgmt]
+    },
+    #   {
+    #     interface = routeros_interface_bonding.bonding_dl380.name # eth6 eth7
+    #     comment   = "DL380 bonding trunk"
+    #     pvid      = [local.pvids.infra] # FIXME: not used
+    #   },
     # {
     #   interface = routeros_interface_ethernet.eth8.name
     #   comment   = "storage"
     #   pvid      = [local.pvids.infra] # FIXME: not used
     # },
-  # ]
+  ]
 }
 
 ### Physical ports
@@ -53,14 +43,14 @@ resource "routeros_interface_ethernet" "eth2" {
   factory_name = "ether2"
   name         = "ether2"
   disabled     = false
-  # comment      = "bonded interface, to switch"
+  comment      = "bonded interface, to switch"
 }
 
 resource "routeros_interface_ethernet" "eth3" {
   factory_name = "ether3"
   name         = "ether3"
   disabled     = false
-  # comment      = "bonded interface, to switch"
+  comment      = "bonded interface, to switch"
 }
 
 resource "routeros_interface_ethernet" "eth4" {
@@ -116,13 +106,13 @@ resource "routeros_interface_ethernet" "sfp" {
 
 ### Virtual interfaces
 
-# resource "routeros_interface_bonding" "bonding_switch" {
-#   name   = "bonding-switch"
-#   slaves = ["ether2", "ether3"]
-#   # lacp_mode = "active"
-#   mode = "balance-alb"
-# }
-#
+resource "routeros_interface_bonding" "bonding_switch" {
+  name      = "bonding-switch"
+  slaves    = [routeros_interface_ethernet.eth2.name, routeros_interface_ethernet.eth3.name]
+  lacp_mode = "active"
+  mode      = "802.3ad"
+}
+
 # resource "routeros_interface_bonding" "bonding_dl380" {
 #   name   = "bonding-dl380"
 #   slaves = ["ether6", "ether7"]
@@ -132,92 +122,48 @@ resource "routeros_interface_ethernet" "sfp" {
 
 ### Bridge
 
-resource "routeros_interface_bridge" "bridge_lan" {
-  name           = "bridge-lan"
-  # vlan_filtering = true
-  # frame_types    = "admit-only-vlan-tagged"
+resource "routeros_interface_bridge" "bridge_vlan" {
+  name           = "bridge_lan"
+  vlan_filtering = true
+  frame_types    = "admit-only-vlan-tagged"
 }
 
 # All lan interfaces are bridged to lan bridge
-# resource "routeros_interface_bridge_port" "lan_bridged_interfaces" {
-#   for_each = {
-#     for idx, interface in local.lan_bridged_interfaces :
-#     interface.interface => interface
-#   }
-#
-#   bridge    = routeros_interface_bridge.bridge_lan.name
-#   interface = each.key
-#
-#   # TODO: probably not working
-#   pvid        = length(each.value.pvid) == 1 ? each.value.pvid[0] : 1
-#   frame_types = length(each.value.pvid) == 1 ? "admit-only-untagged-and-priority-tagged" : "admit-only-vlan-tagged"
-# }
-#
+resource "routeros_interface_bridge_port" "lan_bridged_interfaces" {
+  for_each = {
+    for idx, interface in local.lan_bridged_interfaces :
+    interface.interface => interface
+  }
+
+  bridge    = routeros_interface_bridge.bridge_vlan.name
+  interface = each.key
+
+  pvid        = length(each.value.pvid) == 1 ? each.value.pvid[0] : 1
+  frame_types = length(each.value.pvid) == 1 ? "admit-only-untagged-and-priority-tagged" : "admit-only-vlan-tagged"
+}
+
 ### VLAN
 
-# resource "routeros_interface_vlan" "interface_vlan_home" {
-#   interface = routeros_interface_bridge.bridge_lan.name
-#   name      = "vlan_home"
-#   vlan_id   = local.pvids.home
-# }
-#
-# resource "routeros_interface_vlan" "interface_vlan_guest" {
-#   interface = routeros_interface_bridge.bridge_lan.name
-#   name      = "vlan_guest"
-#   vlan_id   = local.pvids.guest
-# }
-#
-# resource "routeros_interface_vlan" "interface_vlan_infra" {
-#   interface = routeros_interface_bridge.bridge_lan.name
-#   name      = "vlan_infra"
-#   vlan_id   = local.pvids.infra
-# }
-#
-# resource "routeros_interface_vlan" "interface_vlan_mgmt" {
-#   interface = routeros_interface_bridge.bridge_lan.name
-#   name      = "vlan_mgmt"
-#   vlan_id   = local.pvids.mgmt
-# }
+resource "routeros_interface_vlan" "interface_vlan_home" {
+  interface = routeros_interface_bridge.bridge_vlan.name
+  name      = "vlan_home"
+  vlan_id   = local.pvids.home
+}
 
-# resource "routeros_interface_bridge_vlan" "bridge_vlan_home" {
-#   bridge = routeros_interface_bridge.bridge_lan.name
-#   # pvid     = [tostring(local.pvids.home)]
-#   vlan_ids = [tostring(local.pvids.home)]
-#   tagged = [
-#     routeros_interface_bridge.bridge_lan.name,
-#     routeros_interface_ethernet.ether1.name,
-#     routeros_interface_bonding.bonding_switch.name,
-#     routeros_interface_ethernet.eth4.name,
-#   ]
-# }
-#
-# resource "routeros_interface_bridge_vlan" "bridge_vlan_guest" {
-#   bridge   = routeros_interface_bridge.bridge_lan.name
-#   vlan_ids = [tostring(local.pvids.guest)]
-#   tagged = [
-#     routeros_interface_bridge.bridge_lan.name,
-#     routeros_interface_bonding.bonding_switch.name,
-#     routeros_interface_ethernet.eth4.name,
-#   ]
-# }
-#
-# resource "routeros_interface_bridge_vlan" "bridge_vlan_infra" {
-#   bridge   = routeros_interface_bridge.bridge_lan.name
-#   vlan_ids = [tostring(local.pvids.infra)]
-#   tagged = [
-#     routeros_interface_bridge.bridge_lan.name,
-#     routeros_interface_bonding.bonding_switch.name,
-#     routeros_interface_bonding.bonding_dl380.name,
-#     # routeros_interface_ethernet.eth8.name,
-#   ]
-# }
-#
-# resource "routeros_interface_bridge_vlan" "bridge_vlan_mgmt" {
-#   bridge   = routeros_interface_bridge.bridge_lan.name
-#   vlan_ids = [tostring(local.pvids.mgmt)]
-#   tagged = [
-#     routeros_interface_bridge.bridge_lan.name,
-#     routeros_interface_bonding.bonding_switch.name,
-#     routeros_interface_ethernet.eth5.name,
-#   ]
-# }
+resource "routeros_interface_vlan" "interface_vlan_guest" {
+  interface = routeros_interface_bridge.bridge_vlan.name
+  name      = "vlan_guest"
+  vlan_id   = local.pvids.guest
+}
+
+resource "routeros_interface_vlan" "interface_vlan_infra" {
+  interface = routeros_interface_bridge.bridge_vlan.name
+  name      = "vlan_infra"
+  vlan_id   = local.pvids.infra
+}
+
+resource "routeros_interface_vlan" "interface_vlan_mgmt" {
+  interface = routeros_interface_bridge.bridge_vlan.name
+  name      = "vlan_mgmt"
+  vlan_id   = local.pvids.mgmt
+}
