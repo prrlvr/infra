@@ -22,77 +22,39 @@ spec:
       targetRevision: 1.19.0
       helm:
         valuesObject:
-          serviceAccount:
-            create: true
-            automountServiceAccountToken: true
-          service:
-            port: 7979
-          rbac:
-            create: true
-          deploymentStrategy:
-            type: Recreate
-          revisionHistoryLimit: 3
-          automountServiceAccountToken: true
-          podSecurityContext:
-            runAsNonRoot: true
-            fsGroup: 65534
-            seccompProfile:
-              type: RuntimeDefault
-          
-          securityContext:
-            privileged: false
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            runAsNonRoot: true
-            runAsUser: 65532
-            runAsGroup: 65532
-            capabilities:
-              drop: ["ALL"]
+          env:
+            - name: OVH_APPLICATION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ovh-credentials-external-dns
+                  key: application_key
+            - name: OVH_APPLICATION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ovh-credentials-external-dns
+                  key: application_secret
+            - name: OVH_CONSUMER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ovh-credentials-external-dns
+                  key: consumer_key
           serviceMonitor:
             enabled: false
-          logLevel: info
-          logFormat: text
-          interval: 1m
           triggerLoopOnEvent: true
           namespaced: false
-          
-          # -- _Gateway API_ gateway namespace to watch.
           gatewayNamespace: cilium
-          # -- _Kubernetes_ resources to monitor for DNS entries.
           sources:
             - service
-            - ingress
             - gateway-httproute
-            - grpcroute
-            - tlsroute
-            - tcproute
-            - udproute
+            - gateway-grpcroute
+            - gateway-tlsroute
+            - gateway-tcproute
+            - gateway-udproute
           policy: sync
-          
           provider:
             name: ovh
             webhook:
-              image:
-                repository: registry.k8s.io/external-dns/external-dns
-                tag: v0.19.0
-                pullPolicy: IfNotPresent
-
               args:
                 - --source=service
+                - --domain-filter=prrlvr.fr
                 - --provider=ovh
-              env:
-              - name: OVH_APPLICATION_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: ovh-credentials-external-dns
-                    key: application_key
-              - name: OVH_APPLICATION_SECRET
-                valueFrom:
-                  secretKeyRef:
-                    name: ovh-credentials-external-dns
-                    key: application_secret
-              - name: OVH_CONSUMER_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: ovh-credentials-external-dns
-                    key: consumer_key
