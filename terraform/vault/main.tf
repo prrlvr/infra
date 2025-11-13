@@ -35,7 +35,6 @@ provider "vault" {
 }
 
 provider "kubernetes" {
-  alias          = "k8s-prrlvr-fr"
-  config_path    = "~/.kube/config"
-  config_context = "omni-k8s.prrlvr.fr"
+  alias       = "k8s-prrlvr-fr"
+  config_path = "~/.kube/config"
 }
