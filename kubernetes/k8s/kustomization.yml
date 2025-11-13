@@ -7,14 +7,14 @@ resources:
   - cilium.yml
   - cert-manager.yml
   - coredns.yml
-  # - cnpg.yml
+  - cnpg.yml
   - echo.yml
   - external-dns.yml
-  # - external-secrets.yml
+  - external-secrets.yml
   # - grafana.yml
   # - ilo-exporter.yml
   # - kube-prometheus-stack.yml
-  - pdf-tools.yml
+  # - pdf-tools.yml
   - truenas-iscsi.yml
   - truenas-nfs.yml
   # - pgadmin.yml
