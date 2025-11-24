@@ -21,6 +21,8 @@ spec:
         values: |
           config:
             clusterWide: false
+            data:
+              KUBERNETES_CLUSTER_DOMAIN: kube.prrlvr.local
           replicaCount: 2
   syncPolicy:
     syncOptions:

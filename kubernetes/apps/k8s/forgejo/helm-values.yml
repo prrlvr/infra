@@ -1,4 +1,4 @@
-replicaCount: 2
+replicaCount: 1
 
 clusterDomain: kube.prrlvr.local
 image:
@@ -67,16 +67,20 @@ gitea:
   config:
     APP_NAME: "prrlvr's git"
     RUN_MODE: prod
-
+    
     server:
-      SSH_LISTEN_PORT: 2222 # rootless image
+      DOMAIN: git.prrlvr.fr
+      ROOT_URL: https://git.prrlvr.fr
 
     database:
       DB_TYPE: postgres
       HOST: cnpg-postgres-main.cnpg-system.svc.kube.prrlvr.local 
       NAME: forgejo
+      SCHEMA: public
 
   additionalConfigFromEnvs:
+    - name: FORGEJO__DATABASE__SSL_MODE
+      value: require
     - name: FORGEJO__DATABASE__USER
       valueFrom:
         secretKeyRef:
