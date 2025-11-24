@@ -1,0 +1,89 @@
+replicaCount: 2
+
+clusterDomain: kube.prrlvr.local
+image:
+  registry: code.forgejo.org
+  repository: forgejo/forgejo
+  rootless: true
+podDisruptionBudget:
+  minAvailable: 1
+
+service:
+  http:
+    type: ClusterIP
+    port: 3000
+  ssh:
+    type: ClusterIP
+    port: 2222
+
+ingress:
+  enabled: false
+httpRoute:
+  enabled: true
+  hostnames:
+    - git.prrlvr.fr
+  parentRefs:
+    - name: cilium-eg
+      namespace: cilium
+      group: gateway.networking.k8s.io
+      kind: Gateway
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 1024Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+persistence:
+  enabled: true
+  create: true
+  mount: true
+  size: 10Gi
+  accessModes:
+    - ReadWriteMany
+  labels: {}
+  storageClass: truenas-nfs-slow
+  annotations:
+    helm.sh/resource-policy: keep
+
+signing:
+  enabled: false
+  gpgHome: /data/git/.gnupg
+  existingSecret: ''
+
+gitea:
+  admin:
+    existingSecret: forgejo-admin-creds
+    passwordMode: keepUpdated
+
+  metrics:
+    enabled: false
+    serviceMonitor:
+      enabled: false
+      namespace: ''
+
+  config:
+    APP_NAME: "prrlvr's git"
+    RUN_MODE: prod
+
+    server:
+      SSH_LISTEN_PORT: 2222 # rootless image
+
+    database:
+      DB_TYPE: postgres
+      HOST: cnpg-postgres-main.cnpg-system.svc.kube.prrlvr.local 
+      NAME: forgejo
+
+  additionalConfigFromEnvs:
+    - name: FORGEJO__DATABASE__USER
+      valueFrom:
+        secretKeyRef:
+          name: forgejo-postgres-creds
+          key: username
+    - name: FORGEJO__DATABASE__PASSWD
+      valueFrom:
+        secretKeyRef:
+          name: forgejo-postgres-creds
+          key: password

@@ -1,0 +1,29 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: forgejo
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    name: in-cluster
+    namespace: forgejo
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
+  project: default
+  sources:
+    - repoURL: https://github.com/prrlvr/infra.git
+      targetRevision: HEAD
+      path: kubernetes/apps/k8s/forgejo
+      ref: values
+    - repoURL: oci://code.forgejo.org/forgejo-helm/forgejo
+      chart: forgejo
+      targetRevision: 15.0.3
+      helm:
+        valueFiles:
+        -  $values/kubernetes/apps/k8s/forgejo/helm-values.yml

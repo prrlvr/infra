@@ -1,0 +1,6 @@
+---
+kind: Kustomization
+namespace: forgejo
+
+resources:
+  - secrets.yml
