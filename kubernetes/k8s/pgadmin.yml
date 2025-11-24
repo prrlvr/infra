@@ -13,7 +13,7 @@ spec:
   sources:
     - repoURL: https://helm.runix.net
       chart: pgadmin4
-      targetRevision: 1.37.0
+      targetRevision: 1.50.0
       helm:
         values: |
           image:
@@ -25,25 +25,13 @@ spec:
           env:
             email: admin@prrlvr.fr
           ingress:
-            enabled: true
-            annotations:
-              cert-manager.io/cluster-issuer: letsencrypt
-            ingressClassName: nginx
-            hosts:
-              - host: pgadmin.k8s.prrlvr.fr
-                paths:
-                  - path: /
-                    pathType: Prefix
-            tls:
-              - secretName: pgadmin-tls
-                hosts:
-                  - pgadmin.k8s.prrlvr.fr
+            enabled: false
           persistentVolume:
             enabled: true
             accessModes:
               - ReadWriteOnce
             size: 5Gi
-            storageClass: freenas-nfs-csi
+            storageClass: truenas-iscsi-fast
     - repoURL: https://github.com/prrlvr/infra.git
       targetRevision: HEAD
       path: kubernetes/apps/k8s/pgadmin

@@ -42,7 +42,7 @@ resource "random_password" "postgres-superuser-password" {
 resource "vault_generic_secret" "postgres-superuser" {
   path = "k8s-prrlvr-fr/postgres/superuser"
   data_json = jsonencode({
-    username = "superuser"
+    username = "postgres"
     password = random_password.postgres-superuser-password.result
   })
 }
