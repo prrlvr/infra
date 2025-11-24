@@ -12,5 +12,5 @@ spec:
       kind: Gateway
   rules:
     - backendRefs:
-        - name: pgadmin
+        - name: pgadmin-pgadmin4
           port: 80
