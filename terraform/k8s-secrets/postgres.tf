@@ -1,6 +1,7 @@
 locals {
   users = [
-    "forgejo"
+    "forgejo",
+    "vaultwarden",
   ]
 }
 

@@ -1,0 +1,22 @@
+---
+kind: Kustomization
+namespace: vaultwarden
+
+resources:
+  - deployment.yml
+  - http-route.yml
+  - pvc.yml
+  - service.yml
+  - secrets.yml
+
+configMapGenerator:
+  - name: vaultwarden-configmap
+    literals:
+      - ROCKET_PORT=8080
+      - SIGNUPS_ALLOWED=false
+      - WEB_VAULT_ENABLED=true
+      - DOMAIN=https://vaultwarden.prrlvr.fr
+      - DISABLE_ADMIN_TOKEN=false
+      - DATABASE_HOST=cnpg-postgres-main.cnpg-system.svc.kube.prrlvr.local
+      - DATABASE_DB=vaultwarden
+      - HELO_NAME=vaultwarden.prrlvr.fr

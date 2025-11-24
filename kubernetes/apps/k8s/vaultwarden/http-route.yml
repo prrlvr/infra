@@ -1,0 +1,16 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: https-route-vaultwarden
+spec:
+  hostnames:
+    - vaultwarden.prrlvr.fr
+  parentRefs:
+    - name: cilium-eg
+      namespace: cilium
+      group: gateway.networking.k8s.io
+      kind: Gateway
+  rules:
+    - backendRefs:
+        - name: vaultwarden
+          port: 8000

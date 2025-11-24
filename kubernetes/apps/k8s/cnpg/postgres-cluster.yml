@@ -61,3 +61,10 @@ spec:
         name: forgejo
         passwordSecret:
           name: postgres-users-forgejo
+      - connectionLimit: -1
+        ensure: present
+        inherit: true
+        login: true
+        name: vaultwarden
+        passwordSecret:
+          name: postgres-users-vaultwarden

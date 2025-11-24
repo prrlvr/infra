@@ -4,4 +4,4 @@ namespace: monitoring
 
 resources:
   - namespace.yml
-  - scraps-jobs.yml
+  # - scraps-jobs.yml
