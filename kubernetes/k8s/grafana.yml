@@ -17,7 +17,7 @@ spec:
       prune: true
       selfHeal: true
   sources:
-    - repoURL: https://github.com/prrlvr/infra.git
+    - repoURL: https://git.prrlvr.fr/prrlvr/infrastructure.git
       targetRevision: HEAD
       path: kubernetes/apps/k8s/grafana
     - repoURL: https://grafana.github.io/helm-charts
@@ -78,7 +78,7 @@ spec:
               type: prometheus
               orgId: 1
               editable: false
-              url: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+              url: http://kube-prometheus-stack-prometheus.monitoring.svc.kube.prrlvr.local:9090
               isDefault: true
 
           sidecar:

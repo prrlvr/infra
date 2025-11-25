@@ -32,7 +32,7 @@ spec:
               - ReadWriteOnce
             size: 5Gi
             storageClass: truenas-iscsi-fast
-    - repoURL: https://github.com/prrlvr/infra.git
+    - repoURL: https://git.prrlvr.fr/prrlvr/infrastructure.git
       targetRevision: HEAD
       path: kubernetes/apps/k8s/pgadmin
   syncPolicy:

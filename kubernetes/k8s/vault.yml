@@ -11,7 +11,7 @@ spec:
     namespace: vault
   project: default
   sources:
-    - repoURL: https://github.com/prrlvr/infra.git
+    - repoURL: https://git.prrlvr.fr/prrlvr/infrastructure.git
       targetRevision: HEAD
       path: kubernetes/apps/k8s/vault
     - repoURL: https://helm.releases.hashicorp.com

@@ -20,7 +20,7 @@ spec:
       prune: true
       selfHeal: true
   sources:
-    - repoURL: https://github.com/prrlvr/infra.git
+    - repoURL: https://git.prrlvr.fr/prrlvr/infrastructure.git
       targetRevision: HEAD
       path: kubernetes/apps/k8s/prometheus
     - repoURL: https://prometheus-community.github.io/helm-charts

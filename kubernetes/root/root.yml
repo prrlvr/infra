@@ -11,7 +11,7 @@ spec:
     namespace: argocd
   project: default
   source:
-    repoURL: https://github.com/prrlvr/infra.git
+    repoURL: https://git.prrlvr.fr/prrlvr/infrastructure.git
     targetRevision: HEAD
     path: kubernetes/root
   syncPolicy:
