@@ -22,3 +22,4 @@ resources:
   # - rook-ceph-cluster.yml
   # - rook-ceph-operator.yml
   - vault.yml
+  - vaultwarden.yml
